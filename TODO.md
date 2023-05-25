@@ -1,0 +1,3 @@
+- [x] Figure out making an HTTP request
+- [x] Make the actual initial HTTP request
+- [ ] Spin up the echo server when needing to provide a redirect URI
