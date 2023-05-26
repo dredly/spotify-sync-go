@@ -1,4 +1,5 @@
 - [x] Figure out making an HTTP request
 - [x] Make the actual initial HTTP request
 - [x] Spin up the echo server when needing to provide a redirect URI
-- [ ] Maybe figure out graceful shutdown
+- [x] Maybe figure out graceful shutdown
+- [ ] Call the login endpoint without any user interaction

@@ -53,8 +53,11 @@ func main() {
 	authCode := <- authCodeChan
 	fmt.Println("Got auth code " + authCode)
 
-	time.Sleep(1 * time.Second)
-	e.Shutdown(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
+	}
 }
 
 func getLoginUrl() string {
