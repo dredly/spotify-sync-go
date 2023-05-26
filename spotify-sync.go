@@ -3,28 +3,39 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo"
 )
 
 const (
 	authoriseEndpoint string = "https://accounts.spotify.com/authorize"
 	scopes string = "playlist-modify-private playlist-modify-public"
+	redirectUri string = "http://localhost:9000/callback"
+	stateVal string = "miguel"
 )
 
 var (
-	client_id string = getenv("SPOTIFY_API_CLIENT_ID", "fakeid")
+	clientId string = getenv("SPOTIFY_API_CLIENT_ID", "fakeid")
 )
 
 func main() {
+	authCodeChan := make(chan string)
+
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+	e.GET("/login", func(c echo.Context) error {
+		loginUrl := getLoginUrl()
+		fmt.Println("loginUrl = " + loginUrl)
+		return c.Redirect(http.StatusPermanentRedirect, loginUrl)
+	})
+
+	e.GET("/callback", func(c echo.Context) error {
+		code := c.QueryParams().Get("code")
+		authCodeChan <- code
+		return c.String(http.StatusOK, "Got auth code " + code)
 	})
 
 	e.GET("/kill", func(c echo.Context) error {
@@ -33,22 +44,20 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	authorise()
-
 	go func() {
-		if err := e.Start(":8080"); err != nil {
+		if err := e.Start(":9000"); err != nil {
 			e.Logger.Fatal(err)
 		}
 	}()
-	fmt.Println("Server running")
 
-	time.Sleep(30 * time.Second)
+	authCode := <- authCodeChan
+	fmt.Println("Got auth code " + authCode)
 
-	fmt.Println("Server timed out")
+	time.Sleep(1 * time.Second)
+	e.Shutdown(context.Background())
 }
 
-func authorise() {
-	client := &http.Client{}
+func getLoginUrl() string {
 	req, err := http.NewRequest(http.MethodGet, authoriseEndpoint, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -56,27 +65,13 @@ func authorise() {
 
 	q := req.URL.Query()
 	q.Add("response_type", "code")
-	q.Add("client_id", client_id)
-	q.Add("redirect_uri", "miguel")
-	q.Add("state", "whatever")
+	q.Add("client_id", clientId)
+	q.Add("redirect_uri", redirectUri)
+	q.Add("state", stateVal)
 	q.Add("scopes", scopes)
 
 	req.URL.RawQuery = q.Encode()
-
-	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
-	}
-
-	defer resp.Body.Close()
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(resp.Status)
-	fmt.Println(string(responseBody))
+	return req.URL.String()
 }
 
 func getenv(key, fallback string) string {
