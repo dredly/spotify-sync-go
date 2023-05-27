@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/chromedp/cdproto/emulation"
+	"github.com/chromedp/chromedp"
 	"github.com/labstack/echo"
 )
 
@@ -29,19 +31,14 @@ func main() {
 	e.GET("/login", func(c echo.Context) error {
 		loginUrl := getLoginUrl()
 		fmt.Println("loginUrl = " + loginUrl)
-		return c.Redirect(http.StatusPermanentRedirect, loginUrl)
+		return c.Redirect(301, loginUrl)
 	})
 
 	e.GET("/callback", func(c echo.Context) error {
 		code := c.QueryParams().Get("code")
+		fmt.Println("code = " + code)
 		authCodeChan <- code
 		return c.String(http.StatusOK, "Got auth code " + code)
-	})
-
-	e.GET("/kill", func(c echo.Context) error {
-		time.Sleep(1 * time.Second)
-		e.Shutdown(context.Background())
-		return c.String(http.StatusOK, "Hello, World!")
 	})
 
 	go func() {
@@ -50,8 +47,14 @@ func main() {
 		}
 	}()
 
+	time.Sleep(500 * time.Millisecond)
+
+	go hitLoginUrl()
+
 	authCode := <- authCodeChan
 	fmt.Println("Got auth code " + authCode)
+
+	time.Sleep(10 * time.Minute)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -75,6 +78,18 @@ func getLoginUrl() string {
 
 	req.URL.RawQuery = q.Encode()
 	return req.URL.String()
+}
+
+func hitLoginUrl() {
+	chromeCtx, cancelChrome := chromedp.NewContext(context.Background())
+	defer cancelChrome()
+
+	_, err := chromedp.RunResponse(chromeCtx, emulation.SetUserAgentOverride("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"), chromedp.Navigate("http://localhost:9000/login"))
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Println("Finished hitting login url")
+	}
 }
 
 func getenv(key, fallback string) string {
