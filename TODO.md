@@ -4,4 +4,6 @@
 - [x] Maybe figure out graceful shutdown
 - [x] Call the login endpoint without any user interaction
     - [x] Try using browser automation to fill in the login form
+- [x] Simplify chromedp setup
 - [ ] Get token from token endpoint
+- [ ] Restructure with multiple files

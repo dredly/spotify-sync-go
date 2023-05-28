@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/chromedp/chromedp"
@@ -14,6 +17,7 @@ import (
 
 const (
 	authoriseEndpoint string = "https://accounts.spotify.com/authorize"
+	tokenEndpoint     string = "https://accounts.spotify.com/api/token"
 	scopes            string = "playlist-modify-private playlist-modify-public"
 	redirectUri       string = "http://localhost:9000/callback"
 	stateVal          string = "miguel"
@@ -21,6 +25,7 @@ const (
 
 var (
 	clientId        string = getenv("SPOTIFY_API_CLIENT_ID", "fakeid")
+	clientSecret    string = getenv("SPOTIFY_API_CLIENT_SECRET", "fakesecret")
 	spotifyUser     string = getenv("SPOTIFY_USERNAME", "fakeusername")
 	spotifyPassword string = getenv("SPOTIFY_PASSWORD", "fakepassword")
 )
@@ -49,7 +54,8 @@ func main() {
 	go autoLogin()
 
 	authCode := <-authCodeChan
-	fmt.Println("Got auth code " + authCode)
+
+	getAccessToken(authCode)
 
 	// Gracefully shutdown the echo server as its no longer needed
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -57,6 +63,7 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
+
 }
 
 func getLoginUrl() string {
@@ -77,10 +84,8 @@ func getLoginUrl() string {
 }
 
 func autoLogin() {
-	parentCtx, cancel := chromedp.NewExecAllocator(context.Background(), append(chromedp.DefaultExecAllocatorOptions[:], chromedp.Flag("headless", true))...)
-	defer cancel()
-
-	chromeCtx, cancelChrome := chromedp.NewContext(parentCtx)
+	fmt.Println("Attempting autologin")
+	chromeCtx, cancelChrome := chromedp.NewContext(context.Background())
 	defer cancelChrome()
 
 	err := chromedp.Run(chromeCtx, fillInLoginForm())
@@ -89,6 +94,35 @@ func autoLogin() {
 	} else {
 		fmt.Println("Finished hitting login url")
 	}
+}
+
+func getAccessToken(code string) {
+	fmt.Println("Getting access token")
+	
+	v := url.Values{}
+	v.Set("grant_type", "authorization_code")
+	v.Set("code", code)
+	v.Set("redirect_uri", redirectUri)
+
+	req, err := http.NewRequest(http.MethodPost, tokenEndpoint, strings.NewReader(v.Encode()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.SetBasicAuth(clientId, clientSecret)
+
+	c := http.Client{Timeout: 5 * time.Second}
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	resp_body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Body : %s", resp_body)
 }
 
 func fillInLoginForm() chromedp.Tasks {
