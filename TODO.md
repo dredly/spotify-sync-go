@@ -9,3 +9,5 @@
 - [x] See if server can be stopped earlier
 - [x] Handle command line args (just source and destination playlists for now)
 - [ ] Restructure with multiple files
+- [ ] Use refresh token
+- [ ] Add timeouts wherever needed with helpful logs

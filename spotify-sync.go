@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"dredly/spotify-sync/browserautomation"
+	"dredly/spotify-sync/utils"
 	"fmt"
 	"io"
 	"log"
@@ -11,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chromedp/chromedp"
 	"github.com/labstack/echo"
 )
 
@@ -24,10 +25,8 @@ const (
 )
 
 var (
-	clientId        string = getenv("SPOTIFY_API_CLIENT_ID", "fakeid")
-	clientSecret    string = getenv("SPOTIFY_API_CLIENT_SECRET", "fakesecret")
-	spotifyUser     string = getenv("SPOTIFY_USERNAME", "fakeusername")
-	spotifyPassword string = getenv("SPOTIFY_PASSWORD", "fakepassword")
+	clientId        string = utils.GetEnvWithFallback("SPOTIFY_API_CLIENT_ID", "fakeid")
+	clientSecret    string = utils.GetEnvWithFallback("SPOTIFY_API_CLIENT_SECRET", "fakesecret")
 )
 
 func main() {
@@ -62,7 +61,7 @@ func main() {
 		}
 	}()
 
-	go autoLogin()
+	go browserautomation.AutoLogin()
 
 	authCode := <-authCodeChan
 	echoServerGracefulShutdown(e)
@@ -84,19 +83,6 @@ func getLoginUrl() string {
 
 	req.URL.RawQuery = q.Encode()
 	return req.URL.String()
-}
-
-func autoLogin() {
-	fmt.Println("Attempting autologin")
-	chromeCtx, cancelChrome := chromedp.NewContext(context.Background())
-	defer cancelChrome()
-
-	err := chromedp.Run(chromeCtx, fillInLoginForm())
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		fmt.Println("Finished hitting login url")
-	}
 }
 
 func getAccessToken(code string) {
@@ -128,32 +114,10 @@ func getAccessToken(code string) {
 	fmt.Printf("Body : %s", resp_body)
 }
 
-func fillInLoginForm() chromedp.Tasks {
-	loginButtonQuery := "#login-button > span.ButtonInner-sc-14ud5tc-0.cJdEzG.encore-bright-accent-set > span"
-	return chromedp.Tasks{
-		chromedp.Navigate("http://localhost:9000/login"),
-		chromedp.WaitVisible("login-username", chromedp.ByID),
-		chromedp.WaitVisible("login-password", chromedp.ByID),
-		chromedp.WaitVisible(loginButtonQuery, chromedp.ByQuery),
-		chromedp.SendKeys("login-username", spotifyUser, chromedp.ByID),
-		chromedp.SendKeys("login-password", spotifyPassword, chromedp.ByID),
-		chromedp.Click(loginButtonQuery, chromedp.ByQuery),
-		chromedp.WaitNotVisible("login-username", chromedp.ByID),
-	}
-}
-
 func echoServerGracefulShutdown(e *echo.Echo) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
-}
-
-func getenv(key, fallback string) string {
-	value := os.Getenv(key)
-	if len(value) == 0 {
-		return fallback
-	}
-	return value
 }
