@@ -2,5 +2,6 @@
 - [x] Make the actual initial HTTP request
 - [x] Spin up the echo server when needing to provide a redirect URI
 - [x] Maybe figure out graceful shutdown
-- [ ] Call the login endpoint without any user interaction
-    - [ ] Try using browser automation to fill in the login form
+- [x] Call the login endpoint without any user interaction
+    - [x] Try using browser automation to fill in the login form
+- [ ] Get token from token endpoint
