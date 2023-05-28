@@ -5,5 +5,7 @@
 - [x] Call the login endpoint without any user interaction
     - [x] Try using browser automation to fill in the login form
 - [x] Simplify chromedp setup
-- [ ] Get token from token endpoint
+- [x] Get token from token endpoint
+- [x] See if server can be stopped earlier
+- [x] Handle command line args (just source and destination playlists for now)
 - [ ] Restructure with multiple files

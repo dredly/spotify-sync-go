@@ -31,6 +31,17 @@ var (
 )
 
 func main() {
+	playlistIds := os.Args[1:]
+	if len(playlistIds) == 0 {
+		// TODO: Add usage info here
+		log.Fatal("No playlist ids Provided")
+	}
+	if len(playlistIds) % 2 != 0 {
+		log.Fatal("Each source playlist must have a destionation")
+	}
+
+	fmt.Printf("Running spotify-sync with playlist ids %v", playlistIds)
+
 	authCodeChan := make(chan string)
 
 	e := echo.New()
@@ -54,16 +65,8 @@ func main() {
 	go autoLogin()
 
 	authCode := <-authCodeChan
-
+	echoServerGracefulShutdown(e)
 	getAccessToken(authCode)
-
-	// Gracefully shutdown the echo server as its no longer needed
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := e.Shutdown(ctx); err != nil {
-		e.Logger.Fatal(err)
-	}
-
 }
 
 func getLoginUrl() string {
@@ -136,6 +139,14 @@ func fillInLoginForm() chromedp.Tasks {
 		chromedp.SendKeys("login-password", spotifyPassword, chromedp.ByID),
 		chromedp.Click(loginButtonQuery, chromedp.ByQuery),
 		chromedp.WaitNotVisible("login-username", chromedp.ByID),
+	}
+}
+
+func echoServerGracefulShutdown(e *echo.Echo) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := e.Shutdown(ctx); err != nil {
+		e.Logger.Fatal(err)
 	}
 }
 
