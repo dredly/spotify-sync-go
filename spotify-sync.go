@@ -28,5 +28,6 @@ func main() {
 	authCode := <-authCodeChan
 	echoserver.GracefulShutdown(e)
 	c := *apiclient.NewHttpClient()
-	apiclient.GetAccessToken(c, authCode)
+	t := apiclient.GetAccessToken(c, authCode)
+	apiclient.GetDestinationTrackUris(c, t, "placeholder")
 }

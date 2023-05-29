@@ -14,3 +14,4 @@
 - [ ] Add usage info
 - [ ] Use refresh token
 - [ ] Add timeouts wherever needed with helpful logs
+- [ ] Proper logging to a file

@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"dredly/spotify-sync/utils"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -20,7 +21,12 @@ var (
 	clientSecret string = utils.GetEnvWithFallback("SPOTIFY_API_CLIENT_SECRET", "fakesecret")
 )
 
-func GetAccessToken(c http.Client, code string) {
+type accessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+func GetAccessToken(c http.Client, code string) string {
 	fmt.Println("Getting access token")
 
 	v := url.Values{}
@@ -41,9 +47,16 @@ func GetAccessToken(c http.Client, code string) {
 	}
 	defer resp.Body.Close()
 
-	resp_body, err := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Body : %s", resp_body)
+
+	var atr accessTokenResponse
+	err = json.Unmarshal(respBody, &atr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return atr.AccessToken
 }
