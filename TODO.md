@@ -8,6 +8,8 @@
 - [x] Get token from token endpoint
 - [x] See if server can be stopped earlier
 - [x] Handle command line args (just source and destination playlists for now)
-- [ ] Restructure with multiple files
+- [x] Restructure with multiple files
+- [ ] Reuse http client
+- [ ] Add usage info
 - [ ] Use refresh token
 - [ ] Add timeouts wherever needed with helpful logs
