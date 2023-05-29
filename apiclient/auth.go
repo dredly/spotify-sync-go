@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 )
 
 const (
@@ -21,7 +20,7 @@ var (
 	clientSecret string = utils.GetEnvWithFallback("SPOTIFY_API_CLIENT_SECRET", "fakesecret")
 )
 
-func GetAccessToken(code string) {
+func GetAccessToken(c http.Client, code string) {
 	fmt.Println("Getting access token")
 
 	v := url.Values{}
@@ -36,7 +35,6 @@ func GetAccessToken(code string) {
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.SetBasicAuth(clientId, clientSecret)
 
-	c := http.Client{Timeout: 5 * time.Second}
 	resp, err := c.Do(req)
 	if err != nil {
 		log.Fatal(err)

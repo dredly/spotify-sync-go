@@ -9,7 +9,8 @@
 - [x] See if server can be stopped earlier
 - [x] Handle command line args (just source and destination playlists for now)
 - [x] Restructure with multiple files
-- [ ] Reuse http client
+- [x] Reuse http client
+- [ ] Basic syncing (for 1 pair of playlists)
 - [ ] Add usage info
 - [ ] Use refresh token
 - [ ] Add timeouts wherever needed with helpful logs

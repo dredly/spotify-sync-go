@@ -27,5 +27,6 @@ func main() {
 
 	authCode := <-authCodeChan
 	echoserver.GracefulShutdown(e)
-	apiclient.GetAccessToken(authCode)
+	c := *apiclient.NewHttpClient()
+	apiclient.GetAccessToken(c, authCode)
 }
