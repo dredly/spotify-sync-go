@@ -12,7 +12,11 @@
 - [x] Reuse http client
 - [ ] Basic syncing (for 1 pair of playlists)
     - [x] Get uris for destination playlist
-    - [ ] Get uris for source playlist
+    - [x] Get uris for source playlist
+    - [ ] Do the sync
+- [ ] Advanced syncing
+    - [ ] Handle pagination
+    - [ ] Eliminate duplicates
 - [ ] Syncing for multiple pairs
 - [ ] Add usage info
 - [ ] Use refresh token

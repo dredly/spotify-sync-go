@@ -26,7 +26,7 @@ type (
 	}
 )
 
-func GetDestinationTrackUris(c http.Client, token string, playlistId string) []string {
+func GetTrackUris(c http.Client, token string, playlistId string) []string {
 	req, err := http.NewRequest(http.MethodGet, apiBaseUrl + "playlists/" + playlistId + "/tracks", nil)
 	if err != nil {
 		log.Fatal(err)

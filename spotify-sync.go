@@ -3,30 +3,17 @@ package main
 import (
 	"dredly/spotify-sync/apiclient"
 	"dredly/spotify-sync/browserautomation"
+	"dredly/spotify-sync/cli"
 	"dredly/spotify-sync/echoserver"
 	"fmt"
-	"log"
-	"os"
-	"time"
 )
 
 func main() {
-	playlistIds := os.Args[1:]
-	if len(playlistIds) == 0 {
-		// TODO: Add usage info here
-		log.Fatal("No playlist ids Provided")
-	}
-	if len(playlistIds)%2 != 0 {
-		log.Fatal("Each source playlist must have a destionation")
-	}
-
-	fmt.Printf("Running spotify-sync with playlist ids %v", playlistIds)
+	playlistIdPairs := cli.GetPlaylistIdPairs()
+	firstPlaylistIdPair := playlistIdPairs[0]
 
 	authCodeChan := make(chan string)
 	e := echoserver.SpinUpTempServer(authCodeChan)
-
-	// This is to make sure the eechoserver is up and running. Temporary solution
-	time.Sleep(1 * time.Second)
 
 	go browserautomation.AutoLogin()
 	c := *apiclient.NewHttpClient()
@@ -34,6 +21,8 @@ func main() {
 	authCode := <-authCodeChan
 	echoserver.GracefulShutdown(e)
 	t := apiclient.GetAccessToken(c, authCode)
-	destUris := apiclient.GetDestinationTrackUris(c, t, "03whiAjg4TdJtDikG6wZIa?si=2b64819f13ce4c60")
-	fmt.Println(destUris)
+	sourceUris := apiclient.GetTrackUris(c, t, firstPlaylistIdPair.SourceId)
+	destUris := apiclient.GetTrackUris(c, t, firstPlaylistIdPair.DestId)
+	fmt.Println("sourceUris", sourceUris)
+	fmt.Println("destUris", destUris)
 }
