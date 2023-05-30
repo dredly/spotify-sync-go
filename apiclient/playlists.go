@@ -1,7 +1,7 @@
 package apiclient
 
 import (
-	"fmt"
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -9,7 +9,24 @@ import (
 
 const apiBaseUrl = "https://api.spotify.com/v1/"
 
-func GetDestinationTrackUris(c http.Client, token string, playlistId string) {
+type (
+	playlistResponse struct {
+		Uri string `json:"uri"`
+		Tracks tracks `json:"tracks"`
+	}
+	tracks struct {
+		Items []trackItem `json:"items"`
+	}
+	trackItem struct {
+		Track track `json:"track"`
+	}
+	track struct {
+		Uri string `json:"uri"`
+		Name string `json:"name"`
+	}
+)
+
+func GetDestinationTrackUris(c http.Client, token string, playlistId string) []string {
 	req, err := http.NewRequest(http.MethodGet, apiBaseUrl + "playlists/" + playlistId + "/tracks", nil)
 	if err != nil {
 		log.Fatal(err)
@@ -27,6 +44,15 @@ func GetDestinationTrackUris(c http.Client, token string, playlistId string) {
 		log.Fatal(err)
 	}
 
-	fmt.Println("respBody")
-	fmt.Println(string(respBody))
+	var pr playlistResponse
+	err = json.Unmarshal(respBody, &pr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	uris := make([]string, len(pr.Tracks.Items))
+	for i, item := range pr.Tracks.Items {
+		uris[i] = item.Track.Uri
+	}
+	return uris
 }

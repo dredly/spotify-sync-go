@@ -11,6 +11,8 @@
 - [x] Restructure with multiple files
 - [x] Reuse http client
 - [ ] Basic syncing (for 1 pair of playlists)
+    - [x] Get uris for destination playlist
+    - [ ] Get uris for source playlist
 - [ ] Syncing for multiple pairs
 - [ ] Add usage info
 - [ ] Use refresh token
