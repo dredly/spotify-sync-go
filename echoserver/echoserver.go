@@ -3,6 +3,7 @@ package echoserver
 import (
 	"context"
 	"dredly/spotify-sync/utils"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -23,11 +24,13 @@ var clientId string = utils.GetEnvWithFallback("SPOTIFY_API_CLIENT_ID", "fakeid"
 func SpinUpTempServer(authCodeChan chan string) *echo.Echo {
 	e := echo.New()
 	e.GET("/login", func(c echo.Context) error {
+		fmt.Println("Hit /login route")
 		loginUrl := getLoginUrl()
 		return c.Redirect(301, loginUrl)
 	})
 
 	e.GET("/callback", func(c echo.Context) error {
+		fmt.Println("Hit /callback route")
 		code := c.QueryParams().Get("code")
 		authCodeChan <- code
 		return c.String(http.StatusOK, "Got auth code " + code)

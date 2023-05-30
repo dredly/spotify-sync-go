@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 )
@@ -15,6 +16,17 @@ func GetDestinationTrackUris(c http.Client, token string, playlistId string) {
 	}
 	req.Header.Add("Authorization", "Bearer " + token)
 
-	// Just to test
-	fmt.Println("Token is " + token)
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("respBody")
+	fmt.Println(string(respBody))
 }

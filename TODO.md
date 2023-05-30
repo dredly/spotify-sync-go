@@ -11,7 +11,9 @@
 - [x] Restructure with multiple files
 - [x] Reuse http client
 - [ ] Basic syncing (for 1 pair of playlists)
+- [ ] Syncing for multiple pairs
 - [ ] Add usage info
 - [ ] Use refresh token
 - [ ] Add timeouts wherever needed with helpful logs
 - [ ] Proper logging to a file
+- [ ] Paralellised syncing

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -23,11 +24,15 @@ func main() {
 
 	authCodeChan := make(chan string)
 	e := echoserver.SpinUpTempServer(authCodeChan)
+
+	// This is to make sure the eechoserver is up and running. Temporary solution
+	time.Sleep(1 * time.Second) 
+
 	go browserautomation.AutoLogin()
+	c := *apiclient.NewHttpClient()
 
 	authCode := <-authCodeChan
 	echoserver.GracefulShutdown(e)
-	c := *apiclient.NewHttpClient()
 	t := apiclient.GetAccessToken(c, authCode)
-	apiclient.GetDestinationTrackUris(c, t, "placeholder")
+	apiclient.GetDestinationTrackUris(c, t, "03whiAjg4TdJtDikG6wZIa?si=2b64819f13ce4c60")
 }
