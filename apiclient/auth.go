@@ -58,5 +58,6 @@ func GetAccessToken(c http.Client, code string) string {
 		log.Fatal(err)
 	}
 
+	fmt.Println(atr.AccessToken)
 	return atr.AccessToken
 }

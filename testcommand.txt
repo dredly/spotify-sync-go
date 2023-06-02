@@ -1,0 +1,3 @@
+go run . 0v5zHgCcphUloIS7MsKnGq?si=6b6f14418322484a 03whiAjg4TdJtDikG6wZIa?si=a318f6c288904218
+go run . 0v5zHgCcphUloIS7MsKnGq 03whiAjg4TdJtDikG6wZIa
+go run . 0v5zHgCcphUloIS7MsKnGq?si=6b6f14418322484a 03whiAjg4TdJtDikG6wZIa?si=a318f6c288904218

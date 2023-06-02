@@ -1,7 +1,10 @@
 package apiclient
 
 import (
+	"bytes"
+	"dredly/spotify-sync/cli"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +13,10 @@ import (
 const apiBaseUrl = "https://api.spotify.com/v1/"
 
 type (
+	syncRequestBody struct {
+		Uris []string `json:"uris"`
+	}
+
 	playlistResponse struct {
 		Uri string `json:"uri"`
 		Tracks tracks `json:"tracks"`
@@ -26,7 +33,37 @@ type (
 	}
 )
 
-func GetTrackUris(c http.Client, token string, playlistId string) []string {
+func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
+	sourceUris := getTrackUris(c, token, pip.SourceId)
+	srb := syncRequestBody{ Uris: sourceUris }
+	fmt.Println("srb", srb)
+	jsonData, err := json.Marshal(srb)
+	fmt.Println("jsonData", jsonData)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req, err := http.NewRequest("POST", apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("Authorization", "Bearer " + token)
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("sync response", string(respBody), resp.Status)
+}
+
+func getTrackUris(c http.Client, token string, playlistId string) []string {
 	req, err := http.NewRequest(http.MethodGet, apiBaseUrl + "playlists/" + playlistId + "/tracks", nil)
 	if err != nil {
 		log.Fatal(err)

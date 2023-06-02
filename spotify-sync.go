@@ -5,7 +5,6 @@ import (
 	"dredly/spotify-sync/browserautomation"
 	"dredly/spotify-sync/cli"
 	"dredly/spotify-sync/echoserver"
-	"fmt"
 )
 
 func main() {
@@ -21,8 +20,5 @@ func main() {
 	authCode := <-authCodeChan
 	echoserver.GracefulShutdown(e)
 	t := apiclient.GetAccessToken(c, authCode)
-	sourceUris := apiclient.GetTrackUris(c, t, firstPlaylistIdPair.SourceId)
-	destUris := apiclient.GetTrackUris(c, t, firstPlaylistIdPair.DestId)
-	fmt.Println("sourceUris", sourceUris)
-	fmt.Println("destUris", destUris)
+	apiclient.Sync(c, t, firstPlaylistIdPair)
 }
