@@ -10,10 +10,10 @@
 - [x] Handle command line args (just source and destination playlists for now)
 - [x] Restructure with multiple files
 - [x] Reuse http client
-- [ ] Basic syncing (for 1 pair of playlists)
+- [x] Basic syncing (for 1 pair of playlists)
     - [x] Get uris for destination playlist
     - [x] Get uris for source playlist
-    - [ ] Do the sync
+    - [x] Do the sync
 - [ ] Advanced syncing
     - [ ] Handle pagination
     - [ ] Eliminate duplicates

@@ -14,7 +14,7 @@ import (
 const (
 	authoriseEndpoint string = "https://accounts.spotify.com/authorize"
 	tokenEndpoint     string = "https://accounts.spotify.com/api/token"
-	scopes            string = "playlist-modify-private playlist-modify-public"
+	scopes            string = "playlist-modify-public playlist-modify-private"
 	redirectUri       string = "http://localhost:9000/callback"
 	stateVal          string = "miguel"
 )
@@ -64,7 +64,7 @@ func getLoginUrl() string {
 	q.Add("client_id", clientId)
 	q.Add("redirect_uri", redirectUri)
 	q.Add("state", stateVal)
-	q.Add("scopes", scopes)
+	q.Add("scope", scopes)
 
 	req.URL.RawQuery = q.Encode()
 	return req.URL.String()

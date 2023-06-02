@@ -36,13 +36,11 @@ type (
 func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	sourceUris := getTrackUris(c, token, pip.SourceId)
 	srb := syncRequestBody{ Uris: sourceUris }
-	fmt.Println("srb", srb)
 	jsonData, err := json.Marshal(srb)
-	fmt.Println("jsonData", jsonData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req, err := http.NewRequest("POST", apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,14 +51,11 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
+	if resp.StatusCode == 201 {
+		fmt.Println("Sync complete")
+	} else {
+		fmt.Println("Problem with sync response status was " + resp.Status)
 	}
-
-	fmt.Println("sync response", string(respBody), resp.Status)
 }
 
 func getTrackUris(c http.Client, token string, playlistId string) []string {
