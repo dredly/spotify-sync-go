@@ -9,7 +9,6 @@ import (
 
 func main() {
 	playlistIdPairs := cli.GetPlaylistIdPairs()
-	firstPlaylistIdPair := playlistIdPairs[0]
 
 	authCodeChan := make(chan string)
 	e := echoserver.SpinUpTempServer(authCodeChan)
@@ -20,5 +19,7 @@ func main() {
 	authCode := <-authCodeChan
 	echoserver.GracefulShutdown(e)
 	t := apiclient.GetAccessToken(c, authCode)
-	apiclient.Sync(c, t, firstPlaylistIdPair)
+	for _, pip := range playlistIdPairs {
+		apiclient.Sync(c, t, pip)
+	}
 }

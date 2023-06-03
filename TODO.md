@@ -20,16 +20,16 @@
     - [x] Eliminate duplicates
     - [x] Bring back sync functionality
     - [x] Handle edge case of no new tracks
-    - [ ] Pagination of the sync post request
+    - [x] Pagination of the sync post request
         - [x] Break out function for adding the tracks
         - [x] Do the chunking
         - [x] Do the sync with pagination
-- [ ] Syncing for multiple pairs
+- [x] Syncing for multiple pairs
 
 ## Extras
 - [ ] Add usage info
 - [ ] Setup documentation
 - [ ] Use refresh token
 - [ ] Add timeouts wherever needed with helpful logs
-- [ ] Proper logging to a file
+- [ ] Proper error handling
 - [ ] Paralellised syncing

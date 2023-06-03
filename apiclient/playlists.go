@@ -48,8 +48,6 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	}
 
 	uriChunks := utils.Chunkinator(urisToAdd, chunkSize)
-	fmt.Println(uriChunks[0], len(uriChunks))
-
 	for _, uriChunk := range uriChunks {
 		err := addUrisToTrack(c, token, pip.DestId, uriChunk)
 		if err != nil {
