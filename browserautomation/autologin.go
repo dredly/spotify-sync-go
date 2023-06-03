@@ -17,7 +17,7 @@ var (
 )
 
 func AutoLogin() {
-	fmt.Println("Attempting autologin")
+	fmt.Println("Attempting autologin for spotify user ", spotifyUser)
 
 	parentCtx, cancel := chromedp.NewExecAllocator(
 		context.Background(),

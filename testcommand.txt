@@ -1,2 +1,8 @@
 Multiple pairs
 go run . 0nnytqVcDoqtp0Li5BTGlg 31qqwjNo4vTIpYaGSAmHLw 4TUfTfH5lI94mT4mHIe9WL 5DHm5pPk1XilgPTMDpACTZ
+
+Another simple test
+spotify-sync 0v5zHgCcphUloIS7MsKnGq 7sd5tNRVVKgB826JeJ7RJD
+
+For the cron
+spotify-sync 7Cdoi2NdEVBcFtrE8Bgcub 7sd5tNRVVKgB826JeJ7RJD

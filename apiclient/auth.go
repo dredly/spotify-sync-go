@@ -3,7 +3,6 @@ package apiclient
 import (
 	"dredly/spotify-sync/utils"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -27,8 +26,6 @@ type accessTokenResponse struct {
 }
 
 func GetAccessToken(c http.Client, code string) string {
-	fmt.Println("Getting access token")
-
 	v := url.Values{}
 	v.Set("grant_type", "authorization_code")
 	v.Set("code", code)
@@ -57,7 +54,5 @@ func GetAccessToken(c http.Client, code string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(atr.AccessToken)
 	return atr.AccessToken
 }

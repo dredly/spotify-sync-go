@@ -14,14 +14,13 @@ type PlaylistIdPair struct {
 func GetPlaylistIdPairs() []PlaylistIdPair {
 	playlistIds := os.Args[1:]
 	if len(playlistIds) == 0 {
-		// TODO: Add usage info here
 		log.Fatal("No playlist ids Provided")
 	}
 	if len(playlistIds)%2 != 0 {
-		log.Fatal("Each source playlist must have a destionation")
+		log.Fatal("Each source playlist must have a destination")
 	}
 
-	fmt.Printf("Running spotify-sync with playlist ids %v", playlistIds)
+	fmt.Printf("Running with playlist ids %v\n", playlistIds)
 	return getPlaylistPairsFromIds(playlistIds)
 }
 

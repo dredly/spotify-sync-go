@@ -27,9 +27,9 @@
 - [x] Syncing for multiple pairs
 
 ## Extras
-- [ ] Add usage info
+- [x] Timeouts and more appropriate logs
 - [ ] Setup documentation
-- [ ] Use refresh token
-- [ ] Add timeouts wherever needed with helpful logs
+- [ ] Binaries for linux and windows
 - [ ] Proper error handling
+- [ ] Refresh token usage
 - [ ] Paralellised syncing
