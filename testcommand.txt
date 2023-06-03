@@ -2,4 +2,4 @@ Small playlists
 go run . 0v5zHgCcphUloIS7MsKnGq?si=6b6f14418322484a 03whiAjg4TdJtDikG6wZIa
 
 Large source playlist to test pagination
-go run . 4TUfTfH5lI94mT4mHIe9WL?si=b2297b0bb81346fc 03whiAjg4TdJtDikG6wZIa
+go run . 4TUfTfH5lI94mT4mHIe9WL 03whiAjg4TdJtDikG6wZIa

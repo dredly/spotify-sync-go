@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 )
 
 const apiBaseUrl = "https://api.spotify.com/v1/"
@@ -17,10 +16,6 @@ type (
 		Uris []string `json:"uris"`
 	}
 
-	playlistResponse struct {
-		Uri string `json:"uri"`
-		Tracks tracks `json:"tracks"`
-	}
 	tracks struct {
 		Items []trackItem `json:"items"`
 		Next  string `json:"next"`
@@ -36,17 +31,13 @@ type (
 
 func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	sourceUrl := apiBaseUrl + "playlists/" + pip.SourceId + "/tracks"
-	sourceUris, paginationOpts := getTrackUris(c, token, sourceUrl)
-	fmt.Println(sourceUris[0:5])
+	sourceUris, nextLink := getTrackUris(c, token, sourceUrl)
 	counter := 0
-	for paginationOpts != "" && counter < 3 {
-		fmt.Println("paginationOpts", paginationOpts)
-		moreUris, po := getTrackUris(c, token, sourceUrl + "?" + paginationOpts)
-		fmt.Println(moreUris[0:5])
-		fmt.Println("moreUris has length", len(moreUris))
-		fmt.Println("po =", po)
+	for nextLink != "" && counter < 3 {
+		fmt.Println("nextLink", nextLink)
+		moreUris, nl := getTrackUris(c, token, nextLink)
 		sourceUris = append(sourceUris, moreUris...)
-		paginationOpts = po
+		nextLink = nl
 		counter ++
 	}
 
@@ -75,7 +66,7 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	// }
 }
 
-func getTrackUris(c http.Client, token string, url string) (uris []string, paginationOpts string) {
+func getTrackUris(c http.Client, token string, url string) (uris []string, nextLink string) {
 	fmt.Println("url =", url)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -95,22 +86,17 @@ func getTrackUris(c http.Client, token string, url string) (uris []string, pagin
 		log.Fatal(err)
 	}
 
-	var pr playlistResponse
-	err = json.Unmarshal(respBody, &pr)
+	var tr tracks
+	err = json.Unmarshal(respBody, &tr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	uris = make([]string, len(pr.Tracks.Items))
-	for i, item := range pr.Tracks.Items {
+	uris = make([]string, len(tr.Items))
+	for i, item := range tr.Items {
 		uris[i] = item.Track.Uri
 	}
+	nextLink = tr.Next
 
-	// TODO: refactor this into a method receiver on playlistResponse struct
-	if pr.Tracks.Next != "" {
-		spl := strings.Split(pr.Tracks.Next, "?")
-		paginationOpts = spl[len(spl) - 1]
-	}
-
-	return uris, paginationOpts
+	return uris, nextLink
 }
