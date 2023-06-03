@@ -50,14 +50,14 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	uriChunks := utils.Chunkinator(urisToAdd, chunkSize)
 	fmt.Println(uriChunks[0], len(uriChunks))
 
-	// err := addUrisToTrack(c, token, pip.DestId, urisToAdd)
+	for _, uriChunk := range uriChunks {
+		err := addUrisToTrack(c, token, pip.DestId, uriChunk)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
-	// if err == nil {
-	// 	// TODO: Use playlist names in the logs
-	// 	fmt.Printf("Sync successful. Added %d new tracks from playlist %s to playlist %s\n", len(urisToAdd), pip.SourceId, pip.DestId)
-	// } else {
-	// 	log.Fatal(err)
-	// }
+	fmt.Printf("Sync successful. Added %d new tracks from playlist %s to playlist %s\n", len(urisToAdd), pip.SourceId, pip.DestId)
 }
 
 func addUrisToTrack(c http.Client, token string, playlistId string, uris []string) (err error) {

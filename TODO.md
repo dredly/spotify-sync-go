@@ -15,7 +15,7 @@
     - [x] Get uris for destination playlist
     - [x] Get uris for source playlist
     - [x] Do the sync
-- [ ] Advanced syncing
+- [x] Advanced syncing
     - [x] Handle pagination
     - [x] Eliminate duplicates
     - [x] Bring back sync functionality
@@ -23,7 +23,7 @@
     - [ ] Pagination of the sync post request
         - [x] Break out function for adding the tracks
         - [x] Do the chunking
-        - [ ] Do the sync with pagination
+        - [x] Do the sync with pagination
 - [ ] Syncing for multiple pairs
 
 ## Extras
