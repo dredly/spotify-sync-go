@@ -9,3 +9,22 @@ func GetEnvWithFallback(key, fallback string) string {
 	}
 	return value
 }
+
+func Chunkinator(slice []string, chunkSize int) [][]string {
+	length := len(slice)
+	chunkCount := (length + chunkSize - 1) / chunkSize
+	chunks := make([][]string, chunkCount)
+
+	for i := 0; i < chunkCount; i++ {
+		start := i * chunkSize
+		end := start + chunkSize
+
+		if end > length {
+			end = length
+		}
+
+		chunks[i] = slice[start:end]
+	}
+
+	return chunks
+}

@@ -8,7 +8,7 @@ import (
 
 type PlaylistIdPair struct {
 	SourceId string
-	DestId string
+	DestId   string
 }
 
 func GetPlaylistIdPairs() []PlaylistIdPair {
@@ -26,9 +26,9 @@ func GetPlaylistIdPairs() []PlaylistIdPair {
 }
 
 func getPlaylistPairsFromIds(ids []string) []PlaylistIdPair {
-	pairs := make([]PlaylistIdPair, len(ids) / 2)
+	pairs := make([]PlaylistIdPair, len(ids)/2)
 	for i := 0; i < len(ids); i += 2 {
-		pairs[i / 2] = PlaylistIdPair{SourceId: ids[i], DestId: ids[i+1]}
+		pairs[i/2] = PlaylistIdPair{SourceId: ids[i], DestId: ids[i+1]}
 	}
 	return pairs
 }

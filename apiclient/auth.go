@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	redirectUri string = "http://localhost:9000/callback"
-	tokenEndpoint     string = "https://accounts.spotify.com/api/token"
+	redirectUri   string = "http://localhost:9000/callback"
+	tokenEndpoint string = "https://accounts.spotify.com/api/token"
 )
 
 var (
@@ -22,7 +22,7 @@ var (
 )
 
 type accessTokenResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 

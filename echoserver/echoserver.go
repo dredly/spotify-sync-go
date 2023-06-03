@@ -33,7 +33,7 @@ func SpinUpTempServer(authCodeChan chan string) *echo.Echo {
 		fmt.Println("Hit /callback route")
 		code := c.QueryParams().Get("code")
 		authCodeChan <- code
-		return c.String(http.StatusOK, "Got auth code " + code)
+		return c.String(http.StatusOK, "Got auth code "+code)
 	})
 
 	go func() {

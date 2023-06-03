@@ -3,7 +3,9 @@ package apiclient
 import (
 	"bytes"
 	"dredly/spotify-sync/cli"
+	"dredly/spotify-sync/utils"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -12,7 +14,10 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const apiBaseUrl = "https://api.spotify.com/v1/"
+const (
+	apiBaseUrl = "https://api.spotify.com/v1/"
+	chunkSize = 100
+) 
 
 type (
 	syncRequestBody struct {
@@ -21,13 +26,13 @@ type (
 
 	tracks struct {
 		Items []trackItem `json:"items"`
-		Next  string `json:"next"`
+		Next  string      `json:"next"`
 	}
 	trackItem struct {
 		Track track `json:"track"`
 	}
 	track struct {
-		Uri string `json:"uri"`
+		Uri  string `json:"uri"`
 		Name string `json:"name"`
 	}
 )
@@ -42,33 +47,45 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 		return
 	}
 
-	srb := syncRequestBody{ Uris: urisToAdd }
+	uriChunks := utils.Chunkinator(urisToAdd, chunkSize)
+	fmt.Println(uriChunks[0], len(uriChunks))
+
+	// err := addUrisToTrack(c, token, pip.DestId, urisToAdd)
+
+	// if err == nil {
+	// 	// TODO: Use playlist names in the logs
+	// 	fmt.Printf("Sync successful. Added %d new tracks from playlist %s to playlist %s\n", len(urisToAdd), pip.SourceId, pip.DestId)
+	// } else {
+	// 	log.Fatal(err)
+	// }
+}
+
+func addUrisToTrack(c http.Client, token string, playlistId string, uris []string) (err error) {
+	srb := syncRequestBody{Uris: uris}
 
 	jsonData, err := json.Marshal(srb)
 	if err != nil {
 		log.Fatal(err)
 	}
-	req, err := http.NewRequest(http.MethodPost, apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(http.MethodPost, apiBaseUrl+"playlists/"+playlistId+"/tracks", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("Authorization", "Bearer " + token)
+	req.Header.Add("Authorization", "Bearer "+token)
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := c.Do(req)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if resp.StatusCode == 201 {
-		// TODO: Use playlist names in the logs
-		fmt.Printf("Sync successful. Added %d new tracks from playlist %s to playlist %s\n", len(urisToAdd), pip.SourceId, pip.DestId)
-	} else {
-		fmt.Println("Problem with sync response status was " + resp.Status)
+	if resp.StatusCode != 201 {
+		err = errors.New("Got unexpected response status " + resp.Status)
 	}
+	return
 }
 
 func getAllTrackUris(c http.Client, token string, playlistId string) []string {
-	uris, nextLink := getTrackUrisPage(c, token, apiBaseUrl + "playlists/" + playlistId + "/tracks")
+	uris, nextLink := getTrackUrisPage(c, token, apiBaseUrl+"playlists/"+playlistId+"/tracks")
 	for nextLink != "" {
 		moreUris, nl := getTrackUrisPage(c, token, nextLink)
 		uris = append(uris, moreUris...)
@@ -82,7 +99,7 @@ func getTrackUrisPage(c http.Client, token string, url string) (uris []string, n
 	if err != nil {
 		log.Fatal(err)
 	}
-	req.Header.Add("Authorization", "Bearer " + token)
+	req.Header.Add("Authorization", "Bearer "+token)
 
 	resp, err := c.Do(req)
 	if err != nil {
@@ -111,8 +128,6 @@ func getTrackUrisPage(c http.Client, token string, url string) (uris []string, n
 }
 
 func getUrisToAdd(sourceUris []string, destUris []string) []string {
-	fmt.Println("sourceUris", sourceUris)
-	fmt.Println("destUris", destUris)
 	urisToAdd := []string{}
 	for _, uri := range sourceUris {
 		if !slices.Contains(destUris, uri) {

@@ -20,7 +20,7 @@ func AutoLogin() {
 	fmt.Println("Attempting autologin")
 
 	parentCtx, cancel := chromedp.NewExecAllocator(
-		context.Background(), 
+		context.Background(),
 		append(chromedp.DefaultExecAllocatorOptions[:], chromedp.Flag("headless", true), chromedp.UserAgent(userAgent))...)
 	defer cancel()
 
