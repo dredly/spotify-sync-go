@@ -1,3 +1,4 @@
+## MVP
 - [x] Figure out making an HTTP request
 - [x] Make the actual initial HTTP request
 - [x] Spin up the echo server when needing to provide a redirect URI
@@ -15,9 +16,12 @@
     - [x] Get uris for source playlist
     - [x] Do the sync
 - [ ] Advanced syncing
-    - [ ] Handle pagination
-    - [ ] Eliminate duplicates
+    - [x] Handle pagination
+    - [x] Eliminate duplicates
+    - [ ] Bring back sync functionality
 - [ ] Syncing for multiple pairs
+
+## Extras
 - [ ] Add usage info
 - [ ] Use refresh token
 - [ ] Add timeouts wherever needed with helpful logs

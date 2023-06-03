@@ -7,6 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"golang.org/x/exp/slices"
 )
 
 const apiBaseUrl = "https://api.spotify.com/v1/"
@@ -31,7 +33,10 @@ type (
 
 func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	sourceUris := getAllTrackUris(c, token, pip.SourceId)
-	fmt.Println("sourceUris has length", len(sourceUris))
+	destUris := getAllTrackUris(c, token, pip.DestId)
+	urisToAdd := getUrisToAdd(sourceUris, destUris)
+	fmt.Println("urisToAdd has length ", len(urisToAdd))
+
 	// srb := syncRequestBody{ Uris: sourceUris }
 	// fmt.Println(srb)
 	// jsonData, err := json.Marshal(srb)
@@ -97,4 +102,17 @@ func getTrackUrisPage(c http.Client, token string, url string) (uris []string, n
 	nextLink = tr.Next
 
 	return uris, nextLink
+}
+
+func getUrisToAdd(sourceUris []string, destUris []string) []string {
+	fmt.Println("sourceUris", sourceUris)
+	fmt.Println("destUris", destUris)
+	urisToAdd := []string{}
+	for _, uri := range sourceUris {
+		if !slices.Contains(destUris, uri) {
+			urisToAdd = append(urisToAdd, uri)
+		}
+	}
+
+	return urisToAdd
 }
