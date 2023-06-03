@@ -30,17 +30,7 @@ type (
 )
 
 func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
-	sourceUrl := apiBaseUrl + "playlists/" + pip.SourceId + "/tracks"
-	sourceUris, nextLink := getTrackUris(c, token, sourceUrl)
-	counter := 0
-	for nextLink != "" && counter < 3 {
-		fmt.Println("nextLink", nextLink)
-		moreUris, nl := getTrackUris(c, token, nextLink)
-		sourceUris = append(sourceUris, moreUris...)
-		nextLink = nl
-		counter ++
-	}
-
+	sourceUris := getAllTrackUris(c, token, pip.SourceId)
 	fmt.Println("sourceUris has length", len(sourceUris))
 	// srb := syncRequestBody{ Uris: sourceUris }
 	// fmt.Println(srb)
@@ -66,9 +56,17 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	// }
 }
 
-func getTrackUris(c http.Client, token string, url string) (uris []string, nextLink string) {
-	fmt.Println("url =", url)
+func getAllTrackUris(c http.Client, token string, playlistId string) []string {
+	uris, nextLink := getTrackUrisPage(c, token, apiBaseUrl + "playlists/" + playlistId + "/tracks")
+	for nextLink != "" {
+		moreUris, nl := getTrackUrisPage(c, token, nextLink)
+		uris = append(uris, moreUris...)
+		nextLink = nl
+	}
+	return uris
+}
 
+func getTrackUrisPage(c http.Client, token string, url string) (uris []string, nextLink string) {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal(err)
