@@ -1,13 +1,13 @@
 package apiclient
 
 import (
-	"bytes"
 	"dredly/spotify-sync/cli"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
 const apiBaseUrl = "https://api.spotify.com/v1/"
@@ -23,6 +23,7 @@ type (
 	}
 	tracks struct {
 		Items []trackItem `json:"items"`
+		Next  string `json:"next"`
 	}
 	trackItem struct {
 		Track track `json:"track"`
@@ -34,32 +35,50 @@ type (
 )
 
 func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
-	sourceUris := getTrackUris(c, token, pip.SourceId)
-	srb := syncRequestBody{ Uris: sourceUris }
-	jsonData, err := json.Marshal(srb)
-	if err != nil {
-		log.Fatal(err)
+	sourceUrl := apiBaseUrl + "playlists/" + pip.SourceId + "/tracks"
+	sourceUris, paginationOpts := getTrackUris(c, token, sourceUrl)
+	fmt.Println(sourceUris[0:5])
+	counter := 0
+	for paginationOpts != "" && counter < 3 {
+		fmt.Println("paginationOpts", paginationOpts)
+		moreUris, po := getTrackUris(c, token, sourceUrl + "?" + paginationOpts)
+		fmt.Println(moreUris[0:5])
+		fmt.Println("moreUris has length", len(moreUris))
+		fmt.Println("po =", po)
+		sourceUris = append(sourceUris, moreUris...)
+		paginationOpts = po
+		counter ++
 	}
-	req, err := http.NewRequest(http.MethodPost, apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Add("Authorization", "Bearer " + token)
-	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := c.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if resp.StatusCode == 201 {
-		fmt.Println("Sync complete")
-	} else {
-		fmt.Println("Problem with sync response status was " + resp.Status)
-	}
+	fmt.Println("sourceUris has length", len(sourceUris))
+	// srb := syncRequestBody{ Uris: sourceUris }
+	// fmt.Println(srb)
+	// jsonData, err := json.Marshal(srb)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// req, err := http.NewRequest(http.MethodPost, apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// req.Header.Add("Authorization", "Bearer " + token)
+	// req.Header.Add("Content-Type", "application/json")
+
+	// resp, err := c.Do(req)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if resp.StatusCode == 201 {
+	// 	fmt.Println("Sync complete")
+	// } else {
+	// 	fmt.Println("Problem with sync response status was " + resp.Status)
+	// }
 }
 
-func getTrackUris(c http.Client, token string, playlistId string) []string {
-	req, err := http.NewRequest(http.MethodGet, apiBaseUrl + "playlists/" + playlistId + "/tracks", nil)
+func getTrackUris(c http.Client, token string, url string) (uris []string, paginationOpts string) {
+	fmt.Println("url =", url)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,9 +101,16 @@ func getTrackUris(c http.Client, token string, playlistId string) []string {
 		log.Fatal(err)
 	}
 
-	uris := make([]string, len(pr.Tracks.Items))
+	uris = make([]string, len(pr.Tracks.Items))
 	for i, item := range pr.Tracks.Items {
 		uris[i] = item.Track.Uri
 	}
-	return uris
+
+	// TODO: refactor this into a method receiver on playlistResponse struct
+	if pr.Tracks.Next != "" {
+		spl := strings.Split(pr.Tracks.Next, "?")
+		paginationOpts = spl[len(spl) - 1]
+	}
+
+	return uris, paginationOpts
 }
