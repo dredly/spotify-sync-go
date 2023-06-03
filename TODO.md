@@ -19,7 +19,8 @@
     - [x] Handle pagination
     - [x] Eliminate duplicates
     - [x] Bring back sync functionality
-    - [ ] Handle edge case of no new tracks
+    - [x] Handle edge case of no new tracks
+    - [ ] Pagination of the sync post request
 - [ ] Syncing for multiple pairs
 
 ## Extras

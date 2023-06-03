@@ -36,6 +36,12 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	sourceUris := getAllTrackUris(c, token, pip.SourceId)
 	destUris := getAllTrackUris(c, token, pip.DestId)
 	urisToAdd := getUrisToAdd(sourceUris, destUris)
+
+	if len(urisToAdd) == 0 {
+		fmt.Printf("No new tracks since last sync from playlist %s to playlist %s\n", pip.SourceId, pip.DestId)
+		return
+	}
+
 	srb := syncRequestBody{ Uris: urisToAdd }
 
 	jsonData, err := json.Marshal(srb)
