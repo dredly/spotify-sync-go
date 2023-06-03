@@ -18,7 +18,8 @@
 - [ ] Advanced syncing
     - [x] Handle pagination
     - [x] Eliminate duplicates
-    - [ ] Bring back sync functionality
+    - [x] Bring back sync functionality
+    - [ ] Handle edge case of no new tracks
 - [ ] Syncing for multiple pairs
 
 ## Extras

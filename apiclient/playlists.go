@@ -1,6 +1,7 @@
 package apiclient
 
 import (
+	"bytes"
 	"dredly/spotify-sync/cli"
 	"encoding/json"
 	"fmt"
@@ -35,30 +36,29 @@ func Sync(c http.Client, token string, pip cli.PlaylistIdPair) {
 	sourceUris := getAllTrackUris(c, token, pip.SourceId)
 	destUris := getAllTrackUris(c, token, pip.DestId)
 	urisToAdd := getUrisToAdd(sourceUris, destUris)
-	fmt.Println("urisToAdd has length ", len(urisToAdd))
+	srb := syncRequestBody{ Uris: urisToAdd }
 
-	// srb := syncRequestBody{ Uris: sourceUris }
-	// fmt.Println(srb)
-	// jsonData, err := json.Marshal(srb)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// req, err := http.NewRequest(http.MethodPost, apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// req.Header.Add("Authorization", "Bearer " + token)
-	// req.Header.Add("Content-Type", "application/json")
+	jsonData, err := json.Marshal(srb)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req, err := http.NewRequest(http.MethodPost, apiBaseUrl + "playlists/" + pip.DestId + "/tracks", bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Fatal(err)
+	}
+	req.Header.Add("Authorization", "Bearer " + token)
+	req.Header.Add("Content-Type", "application/json")
 
-	// resp, err := c.Do(req)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// if resp.StatusCode == 201 {
-	// 	fmt.Println("Sync complete")
-	// } else {
-	// 	fmt.Println("Problem with sync response status was " + resp.Status)
-	// }
+	resp, err := c.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if resp.StatusCode == 201 {
+		// TODO: Use playlist names in the logs
+		fmt.Printf("Sync successful. Added %d new tracks from playlist %s to playlist %s\n", len(urisToAdd), pip.SourceId, pip.DestId)
+	} else {
+		fmt.Println("Problem with sync response status was " + resp.Status)
+	}
 }
 
 func getAllTrackUris(c http.Client, token string, playlistId string) []string {
