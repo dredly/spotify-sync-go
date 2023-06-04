@@ -28,8 +28,8 @@
 
 ## Extras
 - [x] Timeouts and more appropriate logs
-- [ ] Setup documentation
-- [ ] Binaries for linux and windows
+- [x] Setup documentation
+- [x] Binaries for linux and windows
 - [ ] Proper error handling
 - [ ] Refresh token usage
 - [ ] Paralellised syncing

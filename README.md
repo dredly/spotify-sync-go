@@ -9,7 +9,8 @@ Pull requests are welcome!
 ## Setup
 
 ### Binary
-TODO
+You can get a binary targeted at your architecture from [goblin](https://goblin.barelyhuman.xyz/) using the following command
+```curl -sf http://goblin.barelyhuman.xyz/github.com/dredly/spotify-sync-go | sh```
 
 ### Spotify API
 You will need to login to spotify for developers, and get your client id and client secret.
@@ -33,6 +34,5 @@ By default the crontab won't pick up your environment variables defined in ```.p
 ```
 The above example will run the script with one pair of playlists at 19:30 every day and log to a file.
 
-
 ## In the future
-Support + instructions for Windows and MacOS
+Instructions for windows scheduled job
