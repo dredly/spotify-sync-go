@@ -1,13 +1,14 @@
 package main
 
 import (
-	"dredly/spotify-sync/apiclient"
-	"dredly/spotify-sync/browserautomation"
-	"dredly/spotify-sync/cli"
-	"dredly/spotify-sync/echoserver"
 	"fmt"
 	"log"
 	"time"
+
+	"github.com/dredly/spotify-sync-go/apiclient"
+	"github.com/dredly/spotify-sync-go/browserautomation"
+	"github.com/dredly/spotify-sync-go/cli"
+	"github.com/dredly/spotify-sync-go/echoserver"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 		echoserver.GracefulShutdown(e)
 		log.Fatal("Timed out waiting for auth code")
 	}
-	
+
 	echoserver.GracefulShutdown(e)
 	t := apiclient.GetAccessToken(c, authCode)
 	for _, pip := range playlistIdPairs {

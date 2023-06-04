@@ -2,10 +2,11 @@ package echoserver
 
 import (
 	"context"
-	"dredly/spotify-sync/utils"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/dredly/spotify-sync-go/utils"
 
 	"github.com/labstack/echo"
 )

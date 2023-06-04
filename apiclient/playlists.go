@@ -2,8 +2,6 @@ package apiclient
 
 import (
 	"bytes"
-	"dredly/spotify-sync/cli"
-	"dredly/spotify-sync/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,13 +9,16 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/dredly/spotify-sync-go/cli"
+	"github.com/dredly/spotify-sync-go/utils"
+
 	"golang.org/x/exp/slices"
 )
 
 const (
 	apiBaseUrl = "https://api.spotify.com/v1/"
-	chunkSize = 100
-) 
+	chunkSize  = 100
+)
 
 type (
 	syncRequestBody struct {

@@ -2,9 +2,10 @@ package browserautomation
 
 import (
 	"context"
-	"dredly/spotify-sync/utils"
 	"fmt"
 	"log"
+
+	"github.com/dredly/spotify-sync-go/utils"
 
 	"github.com/chromedp/chromedp"
 )

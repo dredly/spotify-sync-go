@@ -1,13 +1,14 @@
 package apiclient
 
 import (
-	"dredly/spotify-sync/utils"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/dredly/spotify-sync-go/utils"
 )
 
 const (

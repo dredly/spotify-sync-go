@@ -1,4 +1,4 @@
-module dredly/spotify-sync
+module github.com/dredly/spotify-sync-go
 
 go 1.20
 
