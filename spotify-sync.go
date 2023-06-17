@@ -15,6 +15,9 @@ func main() {
 	fmt.Printf("Spotify-Sync -- %v local time\n", time.Now().Format("2006-01-02 15:04:05"))
 	playlistIdPairs := cli.GetPlaylistIdPairs()
 
+	rt := apiclient.GetRefreshTokenFromFileIfPresent()
+	fmt.Println("Refresh token = " + rt)
+
 	authCodeChan := make(chan string)
 	e := echoserver.SpinUpTempServer(authCodeChan)
 
