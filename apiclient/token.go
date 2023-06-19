@@ -22,7 +22,7 @@ func GetRefreshTokenFromFileIfPresent() string {
 }
 
 // Save the refresh token to file ~/.spotify-sync/refresh.txt
-func SaveToken(token string) error {
+func saveToken(token string) error {
 	homeDirName, err := os.UserHomeDir()
     if err != nil {
         log.Fatal( err )

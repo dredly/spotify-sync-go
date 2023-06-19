@@ -26,6 +26,7 @@ type accessTokenResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+// Returns the access token and also saves the refresh token to a file
 func GetAccessToken(c http.Client, code string) string {
 	v := url.Values{}
 	v.Set("grant_type", "authorization_code")
@@ -55,5 +56,8 @@ func GetAccessToken(c http.Client, code string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	saveToken(atr.RefreshToken)
+
 	return atr.AccessToken
 }

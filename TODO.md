@@ -32,8 +32,8 @@
 - [x] Binaries for linux and windows
 - [ ] Refresh token usage
     - [x] Create file to store token
-    - [ ] Actually store the token in the file when obtained
-    - [ ] Check that still works with a binary
+    - [x] Actually store the token in the file when obtained
+    - [x] Check that still works with a binary
     - [ ] Use the refresh token instead of doing autologin if its present
 - [ ] Proper error handling
 - [ ] Paralellised syncing
