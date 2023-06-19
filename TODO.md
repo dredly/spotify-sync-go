@@ -30,10 +30,10 @@
 - [x] Timeouts and more appropriate logs
 - [x] Setup documentation
 - [x] Binaries for linux and windows
-- [ ] Refresh token usage
+- [x] Refresh token usage
     - [x] Create file to store token
     - [x] Actually store the token in the file when obtained
     - [x] Check that still works with a binary
-    - [ ] Use the refresh token instead of doing autologin if its present
+    - [x] Use the refresh token instead of doing autologin if its present
 - [ ] Proper error handling
 - [ ] Paralellised syncing

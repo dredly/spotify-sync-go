@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/dredly/spotify-sync-go/apiclient"
@@ -15,15 +16,29 @@ func main() {
 	fmt.Printf("Spotify-Sync -- %v local time\n", time.Now().Format("2006-01-02 15:04:05"))
 	playlistIdPairs := cli.GetPlaylistIdPairs()
 
-	rt := apiclient.GetRefreshTokenFromFileIfPresent()
-	fmt.Println("Refresh token = " + rt)
+	c := *apiclient.NewHttpClient()
 
+	rt := apiclient.GetRefreshTokenFromFileIfPresent()
+	var token string
+
+	if rt != "" {
+		fmt.Println("Using refresh token")
+		token = apiclient.RefreshAccessToken(c, rt)
+	} else {
+		token = getTokenThroughAutoLogin(c)
+	}
+
+	for _, pip := range playlistIdPairs {
+		apiclient.Sync(c, token, pip)
+	}
+}
+
+func getTokenThroughAutoLogin(c http.Client) string {
 	authCodeChan := make(chan string)
 	e := echoserver.SpinUpTempServer(authCodeChan)
 
 	go browserautomation.AutoLogin()
-	c := *apiclient.NewHttpClient()
-
+	
 	var authCode string
 	select {
 	case authCode = <-authCodeChan:
@@ -33,8 +48,5 @@ func main() {
 	}
 
 	echoserver.GracefulShutdown(e)
-	t := apiclient.GetAccessToken(c, authCode)
-	for _, pip := range playlistIdPairs {
-		apiclient.Sync(c, t, pip)
-	}
+	return apiclient.GetAccessToken(c, authCode)
 }
